@@ -9,10 +9,31 @@ The goal is to safely navigate around a virtual highway with other traffic drivi
 - The car should try to go as close as possible to the 50 MPH speed limit (passing slower traffic when possible). Note that other cars will try to change lanes too. 
 - The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. 
 - The car should be able to make one complete loop around the 6,946m highway. 
-- Hhe car should'nt experience total acceleration greater than 10 m/s^2 and jerk greater than 10 m/s^3.
+- The car should'nt experience total acceleration greater than 10 m/s^2 and jerk greater than 10 m/s^3.
 
 Since the car is trying to go 50 MPH, it should take about 5 minutes to complete 1 loop. 
 
+# Model Documentation
+
+## Car Moves Smoothly
+
+- Car also has a relatively gentle acceleration (`0.20` which is under the required `10 m/s^2` acceleration limit).
+- Car uses the `spline` library to calculate smooth movements for future waypoints which prevents large acceleration and jerk.
+- Previous waypoints are considered while creating new waypoints to ensure a smooth and continuous drive.
+
+## Car Goes Close to 50 MPH
+
+- Model contains a `MAX_SPEED` of 49.0 MPH and will only proceed faster if there is no car in front of the lane it is pursuing (no car directly in front of it or in the lane it is attempting to change to).
+
+## Car Smoothly Changes Lanes
+
+- Car will default to the middle lane but will try and go to the left or right lane if there is a car blocking the immediate front (within 30 meters of car).
+- Car uses the same smoothing techniques when changing lanes.
+
+## Car Avoids Collisions
+
+- Car will smoothly decelerate if a car is directly in front of it (within 30 m)
+- Car will not move into a new lane if it estimates a car will be within 30 meters in front of it during the lane change.
 
 # Data Provided
 
