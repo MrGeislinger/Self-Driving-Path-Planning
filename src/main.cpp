@@ -55,7 +55,7 @@ int main() {
   // Reference velocity
   double ref_vel = 0.0;
 
-  h.onMessage([&map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
+  h.onMessage([&lane,&ref_vel, &map_waypoints_x,&map_waypoints_y,&map_waypoints_s,
                &map_waypoints_dx,&map_waypoints_dy]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                uWS::OpCode opCode) {
@@ -109,7 +109,7 @@ int main() {
           int path_size = previous_path_x.size();
 
           // Preventing collitions
-          if (prev_size > 0) {
+          if (path_size > 0) {
             car_s = end_path_s;
           }
 
@@ -141,7 +141,7 @@ int main() {
               double check_car_s = sensor_fusion[i][5];
 
               // Get other car position after moving our car
-              check_car_s += ((double)prev_size * 0.02 * check_speed);
+              check_car_s += ((double)path_size * 0.02 * check_speed);
 
               // If the car is in a near lane, check if it's close (30m)
               if (car_lane == lane) { // Car is in our lane
@@ -187,7 +187,7 @@ int main() {
           double ref_yaw = deg2rad(car_yaw);
 
           // If there aren't that many previous points, just calculate them
-          if (prev_size < 2) {
+          if (path_size < 2) {
               double prev_car_x = car_x - cos(car_yaw);
               double prev_car_y = car_y - sin(car_yaw);
 
@@ -197,11 +197,11 @@ int main() {
               ptsy.push_back(prev_car_y);
               ptsy.push_back(car_y);
           } else { // More so let's use the past 2 waypoints
-              ref_x = previous_path_x[prev_size - 1];
-              ref_y = previous_path_y[prev_size - 1];
+              ref_x = previous_path_x[path_size - 1];
+              ref_y = previous_path_y[path_size - 1];
 
-              double ref_x_prev = previous_path_x[prev_size - 2];
-              double ref_y_prev = previous_path_y[prev_size - 2];
+              double ref_x_prev = previous_path_x[path_size - 2];
+              double ref_y_prev = previous_path_y[path_size - 2];
               ref_yaw = atan2(ref_y-ref_y_prev, ref_x-ref_x_prev);
 
               ptsx.push_back(ref_x_prev);
@@ -241,7 +241,7 @@ int main() {
           vector<double> next_x_vals;
           vector<double> next_y_vals;
           
-          for (int i = 0; i < prev_size; i++) {
+          for (int i = 0; i < path_size; i++) {
             next_x_vals.push_back(previous_path_x[i]);
             next_y_vals.push_back(previous_path_y[i]);
           }
@@ -252,7 +252,7 @@ int main() {
           double target_dist = sqrt(target_x*target_x + target_y*target_y);
           double x_add_on = 0;
 
-          for(int i = 1; i < 50 - prev_size; i++) {
+          for(int i = 1; i < 50 - path_size; i++) {
             ref_vel += speed_diff;
             if (ref_vel > MAX_SPEED) {
               ref_vel = MAX_SPEED;
