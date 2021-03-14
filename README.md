@@ -13,6 +13,19 @@ The goal is to safely navigate around a virtual highway with other traffic drivi
 
 Since the car is trying to go 50 MPH, it should take about 5 minutes to complete 1 loop. 
 
+# TO RUN
+
+Simuly run these commands:
+
+```
+mkdir build
+cd build/
+cmake .. && make
+./path_planning
+```
+
+or simply run `run_me.sh` after creating the `build` directory (`mkdir build && chmod +x run_me.sh && ./run_me.sh`)
+
 # Model Documentation
 
 ## Car Moves Smoothly
